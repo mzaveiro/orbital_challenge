@@ -3,7 +3,7 @@
 All data containers we use to normalise the information from the leases
 schedule.
 """
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -14,7 +14,7 @@ class ScheduleEntryType(BaseModel):
     entry_number: int = Field(alias="entryNumber")
     entry_date: str = Field(alias="entryDate")
     entry_type: str = Field(alias="entryType")
-    entry_text: List[str] = Field(alias="entryText")
+    entry_text: List[Optional[str]] = Field(alias="entryText")
 
 
 class ScheduleType(BaseModel):

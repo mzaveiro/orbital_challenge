@@ -8,6 +8,8 @@ import pydantic
 
 from lease_schedule import models
 
+logger = logging.getLogger()
+
 
 def process_entry(lease_schedule: Dict) -> None:
     """Process each lease schedule.
@@ -18,9 +20,10 @@ def process_entry(lease_schedule: Dict) -> None:
     try:
         lease_data = models.LeasesScheduleType.parse_obj(lease_schedule)
     except pydantic.ValidationError as err:
-        logger = logging.getLogger()
         logger.exception(err)
         return
+
+    logger.debug(lease_data)
 
 
 def process_file(json_file: Path) -> None:
