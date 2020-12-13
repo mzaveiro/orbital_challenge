@@ -7,37 +7,11 @@ Usage:
 import logging
 from logging import config as log_config
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
-import ijson
 import typer
 
-from lease_schedule import models
-
-
-def process_entry(lease_schedule: Dict) -> None:
-    """Process each lease schedule.
-
-    Args:
-        lease_schedule: Each lease schedule data for the property.
-    """
-    lease_data = models.LeasesScheduleType.parse_obj(lease_schedule)
-    print(lease_data)
-
-
-def process_file(json_file: Path) -> None:
-    """Process a json file.
-
-    Parse the file for all schedule of notices entries.
-
-    Args:
-        json_file: The JSON file we want to parse.
-    """
-    with open(json_file) as fd:
-        title_register_data = ijson.items(fd, "")
-        for all_leases in title_register_data:
-            for lease_entry in all_leases:
-                process_entry(lease_entry)
+from lease_schedule import parser
 
 
 def main(
@@ -78,7 +52,7 @@ def main(
         typer.echo("No json file specified.")
         raise typer.Abort()
 
-    process_file(json_file)
+    parser.process_file(json_file)
 
 
 if __name__ == "__main__":
