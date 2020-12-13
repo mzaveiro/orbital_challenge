@@ -1,0 +1,15 @@
+[flake8]
+max-line-length = 79
+inline-quotes = "
+ignore = D204
+rst-roles =
+    class,
+    func,
+    ref,
+rst-directives =
+    envvar,
+    exception
+extend-ignore =
+    ANN101,
+    # See https://github.com/PyCQA/pycodestyle/issues/373
+    E203,E231,
