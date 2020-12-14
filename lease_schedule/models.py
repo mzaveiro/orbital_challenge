@@ -8,6 +8,16 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
+class ParsedText(BaseModel):
+    """Lease entry after being parsed."""
+
+    reg_date_and_ref: str
+    property_desc: str
+    lease_date_and_term: str
+    lessees_title: str
+    note: Optional[str] = None
+
+
 class ScheduleEntryType(BaseModel):
     """Each entry of the lease template."""
 
@@ -15,6 +25,7 @@ class ScheduleEntryType(BaseModel):
     entry_date: str = Field(alias="entryDate")
     entry_type: str = Field(alias="entryType")
     entry_text: List[Optional[str]] = Field(alias="entryText")
+    parsed_text: Optional[ParsedText] = None
 
 
 class ScheduleType(BaseModel):
