@@ -24,6 +24,52 @@ class Column:
     end: int
 
 
+
+def process_entry_text(
+    line: str,
+    parsed_text: models.ParsedText,
+    columns: List[Column],
+) -> None:
+    """Process text entry lines.
+
+    Based on the first line, now we process the rest of the lines.
+
+    Args:
+        line: The string we want to divide in columns.
+        parsed_text: The existing object with the parsed text so far.
+        columns: The text delimiters for each column.
+    """
+    if not line:
+        return
+
+    if line.startswith("NOTE"):
+        parsed_text.note = line
+        return
+
+    for column_no, column in enumerate(columns[:3]):
+        text = line[column.start : columns[column_no + 1].start]
+        text = text.rstrip()
+
+        if not text:
+            continue
+
+        if column_no == 0:
+            parsed_text.reg_date_and_ref = (
+                f"{parsed_text.reg_date_and_ref} {text}"
+            )
+
+        elif column_no == 1:
+            parsed_text.property_desc = (
+                f"{parsed_text.property_desc} {text}"
+            )
+
+        elif column_no == 2:
+            parsed_text.lease_date_and_term = (
+                f"{parsed_text.lease_date_and_term} {text}"
+            )
+
+
+
 def process_first_line(text: str) -> List[Column]:
     """Process the first line of a text entry.
 
@@ -101,6 +147,9 @@ def process_text(entry_text: List[str]) -> Optional[models.ParsedText]:
         lease_date_and_term=first_line[columns[2].start : columns[2].end],
         lessees_title=first_line[columns[3].start : columns[3].end],
     )
+
+    for line in entry_text[1:]:
+        process_entry_text(line, parsed_text, columns)
     return parsed_text
 
 
