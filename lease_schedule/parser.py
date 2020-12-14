@@ -3,7 +3,7 @@ import dataclasses
 import logging
 import re
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import ijson
 import pydantic
@@ -77,7 +77,7 @@ def process_first_line(text: str) -> List[Column]:
     return all_columns
 
 
-def process_text(entry_text: List[str]) -> models.ParsedText:
+def process_text(entry_text: List[str]) -> Optional[models.ParsedText]:
     """Parse the information from the entry text field.
 
     The information is structured as an array of strings with whitespace as
@@ -85,8 +85,23 @@ def process_text(entry_text: List[str]) -> models.ParsedText:
 
     Args:
         entry_text: A list of strings that contains the entry data.
+
+    Returns:
+        The parsed columns from the text entry, if successful.
     """
     columns = process_first_line(entry_text[0])
+    first_line = entry_text[0]
+    if len(columns) < 4:
+        logger.error(f"Too few columns parsed: {first_line}")
+        return None
+
+    parsed_text = models.ParsedText(
+        reg_date_and_ref=first_line[columns[0].start : columns[0].end],
+        property_desc=first_line[columns[1].start : columns[1].end],
+        lease_date_and_term=first_line[columns[2].start : columns[2].end],
+        lessees_title=first_line[columns[3].start : columns[3].end],
+    )
+    return parsed_text
 
 
 def process_entry(lease_schedule: Dict) -> None:
@@ -100,6 +115,11 @@ def process_entry(lease_schedule: Dict) -> None:
     except pydantic.ValidationError as err:
         logger.exception(err)
         return
+
+    # now parse the columns of the entry text.
+    for schedule_entry in lease_data.lease_schedule.schedule_entry:
+        parsed_text = process_text(schedule_entry.entry_text)
+        schedule_entry.parsed_text = parsed_text
 
     logger.debug(lease_data)
 

@@ -13,6 +13,6 @@ extend-ignore =
     ANN101,
     # See https://github.com/PyCQA/pycodestyle/issues/373
     E203,E231,
-    WPS306
+    WPS305,WPS306
 per-file-ignores =
   test_*:S101,E501
